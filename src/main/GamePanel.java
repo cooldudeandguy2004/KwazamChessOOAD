@@ -1,11 +1,23 @@
 package main;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -25,11 +37,32 @@ public class GamePanel extends JPanel implements Runnable {
     public static final int BLUE = 0;
     int currentColor = BLUE;
 
+    //Save button
+    private JPanel sidePanel;
+    private JButton saveGameButton;
+
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.BLACK);
         setPieces();
         copyPieces(pieces, simPieces);
+
+        //Side panel and save game button
+        sidePanel = new JPanel();
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+        sidePanel.setBackground(Color.WHITE);
+
+        saveGameButton = new JButton("Save Game");
+        saveGameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveGame();
+            }
+        });
+        sidePanel.add(saveGameButton);
+
+        this.setLayout(new BorderLayout());
+        this.add(sidePanel, BorderLayout.EAST);
     }
 
     public void launchGame() {
@@ -107,5 +140,79 @@ public class GamePanel extends JPanel implements Runnable {
             p.draw(g2);
         }
     }
+
+    //Save game method
+    public void saveGame() {
+        JFileChooser fileChooser = new JFileChooser();
+        int returnValue = fileChooser.showSaveDialog(this);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+
+
+            //Check if file does not have .txt and add it
+            if (!selectedFile.getName().endsWith(".txt")) {
+                selectedFile = new File(selectedFile.getParent(), selectedFile.getName() + ".txt");
+            }
+            
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(selectedFile))) {
+                writer.write("CurrentColor: " + currentColor + "\n");
+                for (Piece piece : pieces) {
+                    writer.write(piece.getClass().getSimpleName() + "," + piece.color + "," + piece.col + "," + piece.row + "\n");
+                }
+                JOptionPane.showMessageDialog(this, "Game saved successfully.");
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to save game.");
+            }
+        }    
+    }
+
+    //Helper method to create piece based on type
+    private Piece createPiece(String pieceType, int color, int col, int row) {
+        switch (pieceType) {
+            case "Ram":
+                return new Ram(color, col, row);
+            case "Xor":
+                return new Xor(color, col, row);
+            case "Biz":
+                return new Biz(color, col, row);
+            case "Sau":
+                return new Sau(color, col, row);
+            case "Tor":
+                return new Tor(color, col, row);
+            default:
+                return null;
+        }
+    }
+
+    public void loadGame(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            pieces.clear(); //Clear current game pieces
+            String line = reader.readLine();
+            if (line != null && line.startsWith("CurrentColor: ")) {
+                currentColor = Integer.parseInt(line.split(":")[1].trim());
+            }
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                String pieceType = parts[0];
+                int color = Integer.parseInt(parts[1]);
+                int col = Integer.parseInt(parts[2]);
+                int row = Integer.parseInt(parts[3]);
+                Piece piece = createPiece(pieceType, color, col, row);
+                if (piece != null) {
+                    pieces.add(piece);
+                }
+            }
+
+            copyPieces(pieces, simPieces);
+            JOptionPane.showMessageDialog(this, "Game loaded successfully.");
+            repaint();
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load game.");
+        }
+    }
+
+    
 
 }
