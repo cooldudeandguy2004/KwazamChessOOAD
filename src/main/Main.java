@@ -10,7 +10,15 @@ public class Main {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
 
-        //Add GamePanel to the window
+        //Create main menu
+        MainMenu menu = new MainMenu(window);
+        window.add(menu);
+
+        window.setSize(800,600);
+        window.setLocationRelativeTo(null);
+        window.setVisible(true);
+
+        /*Add GamePanel to the window
         GamePanel gp = new GamePanel();
         window.add(gp);
         window.pack();
@@ -20,7 +28,7 @@ public class Main {
         window.setLocationRelativeTo(null);
         window.setVisible(true);
 
-        gp.launchGame();
+        gp.launchGame();*/
     }
 
 }
