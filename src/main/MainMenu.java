@@ -21,7 +21,7 @@ public class MainMenu extends JPanel {
 
         //Load background image
         try {
-            backgroundImage = ImageIO.read(new File("res\\chessbackground.jpg"));
+            backgroundImage = ImageIO.read(new File("res\\chessback.jpg"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,7 +37,7 @@ public class MainMenu extends JPanel {
         newGameButton.setContentAreaFilled(false);
         newGameButton.setBorderPainted(false);
         newGameButton.setForeground(Color.BLACK);
-        newGameButton.setFont(new Font("Arial", Font.PLAIN, 18));
+        newGameButton.setFont(new Font("Arial", Font.PLAIN, 24));
         newGameButton.setFocusPainted(false);
         newGameButton.addActionListener(new ActionListener() {
             @Override
@@ -71,7 +71,7 @@ public class MainMenu extends JPanel {
         loadGameButton.setContentAreaFilled(false);
         loadGameButton.setBorderPainted(false);
         loadGameButton.setForeground(Color.BLACK);
-        loadGameButton.setFont(new Font("Arial", Font.PLAIN, 18));
+        loadGameButton.setFont(new Font("Arial", Font.PLAIN, 24));
         loadGameButton.setFocusPainted(false);
         loadGameButton.addActionListener(new ActionListener() {
             @Override
