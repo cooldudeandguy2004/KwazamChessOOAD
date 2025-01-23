@@ -15,9 +15,11 @@ public class MainMenu extends JPanel {
     private JFrame window;
     private Image backgroundImage;
 
+    //Sets the mainmenu window
     public MainMenu(JFrame window) {
         this.window = window;
-        setLayout(new GridLayout(3, 1));
+        //setLayout(new GridLayout(3, 1));
+        setLayout(null);
 
         //Load background image
         try {
@@ -26,82 +28,76 @@ public class MainMenu extends JPanel {
             e.printStackTrace();
         }
 
+        //Create the title on the main menu
         JLabel title = new JLabel("Kwazam Chess", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 24));
+        title.setFont(new Font("Arial", Font.BOLD, 36));
         title.setOpaque(false);
+        title.setForeground(Color.WHITE);
+        title.setBounds(100, 50, 600, 50);
         add(title);
 
-        JButton newGameButton = new JButton("New Game");
-        
-        newGameButton.setOpaque(false);
-        newGameButton.setContentAreaFilled(false);
-        newGameButton.setBorderPainted(false);
-        newGameButton.setForeground(Color.BLACK);
-        newGameButton.setFont(new Font("Arial", Font.PLAIN, 24));
-        newGameButton.setFocusPainted(false);
+
+        //Create the new game button
+        JButton newGameButton = createButton("New Game", 0, 400);
         newGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 startNewGame();
             }
         });
-        newGameButton.addMouseListener(new MouseAdapter() {
-            private final Font defaultFont = newGameButton.getFont();
-            private final Font hoverFont = defaultFont.deriveFont(defaultFont.getStyle(), defaultFont.getSize() + 2);
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                newGameButton.setFont(hoverFont);
-                newGameButton.setForeground(Color.DARK_GRAY);
-                newGameButton.setBorder(BorderFactory.createRaisedBevelBorder());
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                newGameButton.setFont(defaultFont);
-                newGameButton.setForeground(Color.BLACK);
-                newGameButton.setBorder(null);
-            }
-
-        });
         add(newGameButton);
 
-        JButton loadGameButton = new JButton("Load Game");
-        loadGameButton.setOpaque(false);
-        loadGameButton.setContentAreaFilled(false);
-        loadGameButton.setBorderPainted(false);
-        loadGameButton.setForeground(Color.BLACK);
-        loadGameButton.setFont(new Font("Arial", Font.PLAIN, 24));
-        loadGameButton.setFocusPainted(false);
+        
+        //Create the load game button
+        JButton loadGameButton = createButton("Load Game", 0, 500);
         loadGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 loadGame();
             }
         });
+        add(loadGameButton);
 
-        loadGameButton.addMouseListener(new MouseAdapter() {
-            private final Font defaultFont = loadGameButton.getFont();
+        revalidate();
+        repaint();
+        
+    }
+
+    //Create button
+    private JButton createButton(String text, int x, int y) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Helvetica", Font.BOLD, 24));
+        button.setForeground(Color.WHITE);
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setBorder(null);
+        button.setFocusPainted(false);
+        button.setBounds(x, y, 150, 40);
+
+        //Hovering mouse effect
+        button.addMouseListener(new MouseAdapter() {
+            private final Font defaultFont = button.getFont();
             private final Font hoverFont = defaultFont.deriveFont(defaultFont.getStyle(), defaultFont.getSize() + 2);
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                loadGameButton.setFont(hoverFont);
-                loadGameButton.setForeground(Color.DARK_GRAY);
-                loadGameButton.setBorder(BorderFactory.createRaisedBevelBorder());
+                button.setFont(hoverFont);
+                button.setForeground(Color.LIGHT_GRAY);
+                button.setFocusPainted(false);
+                button.setBorder(BorderFactory.createRaisedBevelBorder());
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                loadGameButton.setFont(defaultFont);
-                loadGameButton.setForeground(Color.BLACK);
-                loadGameButton.setBorder(null);
+                button.setFont(defaultFont);
+                button.setForeground(Color.WHITE);
+                button.setBorder(null);
             }
         });
-    
-        add(loadGameButton);
+        return button;
     }
 
+    //Paints the background image
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -110,6 +106,7 @@ public class MainMenu extends JPanel {
         }
     }
 
+    //Method for when clicking new game
     private void startNewGame() {
         window.getContentPane().removeAll();
         GamePanel gp = new GamePanel();
@@ -122,8 +119,9 @@ public class MainMenu extends JPanel {
         gp.launchGame();
     }
 
+    //Method for when clicking load game
     private void loadGame() {
-        // Implement your load game logic here
+
         JFileChooser fileChooser = new JFileChooser();
         int returnValue = fileChooser.showOpenDialog(this);
 
@@ -137,13 +135,6 @@ public class MainMenu extends JPanel {
             window.setLocationRelativeTo(null);
             window.setVisible(true);
             gp.loadGame(selectedFile.getPath());
-            /*try {
-                //Read file and parse game state
-                java.util.List<String> lines = java.nio.file.Files.readAllLines(selectedFile.toPath());
-                loadGameFromFile(lines);
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(window, "Error loading game: " + e.getMessage());
-            }*/
         }
     }
 

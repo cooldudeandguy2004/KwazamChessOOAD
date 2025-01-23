@@ -36,20 +36,7 @@ public class Piece {
         }
         return img;
     }
-    
 
-
-    /*public BufferedImage getImage(String imagePath) {
-        BufferedImage image = null;
-
-        try {
-            image = ImageIO.read(new File(imagePath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return image;
-    }*/
 
     public int getX(int col) {
         return col * Board.SQUARE_SIZE;
@@ -96,7 +83,7 @@ public class Piece {
     }
     public Piece getHittingP(int targetCol, int targetRow) {
         for(Piece piece : GamePanel.simPieces) {
-            if(piece.col == targetCol && peice.row == targetRow && piece != this) {
+            if(piece.col == targetCol && piece.row == targetRow && piece != this) {
                 return piece;
             }
         }
