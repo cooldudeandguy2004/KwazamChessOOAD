@@ -172,7 +172,7 @@ public class Piece {
             for(int c = preCol-1; c > targetCol; c-- ) {
                 int diff = Math.abs(c - preCol);
                 for (Piece piece : GamePanel.simPieces) {
-                    if (piece.col == c && peice.row == preRow - diff) {
+                    if (piece.col == c && piece.row == preRow - diff) {
                         hittingP = piece;
                         return true;
                     }
