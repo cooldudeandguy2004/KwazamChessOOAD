@@ -210,7 +210,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         if(activeP != null) {
             if(canMove) {
-                g2.setColor(Color.white);
+                g2.setColor(Color.blue);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7F));
                 g2.fillRect(activeP.col*Board.SQUARE_SIZE, activeP.row*Board.SQUARE_SIZE,
                         Board.SQUARE_SIZE, Board.SQUARE_SIZE);
