@@ -36,6 +36,7 @@ public class GamePanel extends JPanel implements Runnable {
     //Pieces
     public static ArrayList<Piece> pieces = new ArrayList<>();
     public static ArrayList<Piece> simPieces = new ArrayList<>();
+    ArrayList<Piece> transformedPieces = new ArrayList<>();
     Piece activeP;
 
     // Color
@@ -46,6 +47,7 @@ public class GamePanel extends JPanel implements Runnable {
     // BOOLEANS
     boolean canMove;
     boolean validSquare;
+    boolean change;
 
     //Save button
     private JPanel sidePanel;
@@ -201,17 +203,42 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
-    private void changePlayer() {
+    private int turnCounter = 0;
 
-        if(currentColor == BLUE) {
+    private void changePlayer() {
+        if (currentColor == BLUE) {
             currentColor = RED;
-        }
-        else {
+        } else {
             currentColor = BLUE;
+            turnCounter++;  // Increment after both Blue and Red move
+    
+            if (turnCounter % 1 == 0) { 
+                transformPieces();
+            }
         }
         activeP = null;
     }
 
+    private void transformPieces() {
+        ArrayList<Piece> transformedPieces = new ArrayList<>();
+        
+        for (Piece piece : pieces) {
+            if (piece instanceof Tor) {
+                transformedPieces.add(new Xor(piece.color, piece.col, piece.row));
+            } else if (piece instanceof Xor) {
+                transformedPieces.add(new Tor(piece.color, piece.col, piece.row));
+            } else {
+                transformedPieces.add(piece);  // Keep other pieces unchanged
+            }
+        }
+    
+        pieces = transformedPieces;
+        copyPieces(pieces, simPieces);
+    
+    
+        pieces = transformedPieces;
+        copyPieces(pieces, simPieces);
+    }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
