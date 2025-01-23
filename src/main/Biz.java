@@ -11,4 +11,14 @@ public class Biz extends Piece {
             image = getImage("res\\Piece\\RBIZ.png");
         }
     }
+    public boolean canMove(int targetCol, int targetRow) {
+        if(isWithinBoard(targetCol, targetRow)) {
+            if(Math.abs(targetCol - preCol) * Math.abs(targetRow - preRow) == 2) {
+                if(isValidSquare(targetCol, targetRow)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
