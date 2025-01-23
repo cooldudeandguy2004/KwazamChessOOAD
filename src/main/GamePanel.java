@@ -20,6 +20,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.AlphaComposite;
+import java.awt.Font;
+import java.awt.RenderingHints;
 
 
 public class GamePanel extends JPanel implements Runnable {
@@ -233,6 +235,19 @@ public class GamePanel extends JPanel implements Runnable {
 
 
             activeP.draw(g2);
+        }
+
+        // status 
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2.setFont(new Font("Book Antiqua", Font.PLAIN, 25 ));
+        g2.setColor(Color.white);
+
+        if(currentColor == BLUE) {
+            g2.drawString("Blue's turn", 530, 550);
+
+        }
+        else {
+            g2.drawString("Red's turn", 530, 250);
         }
     }
 
