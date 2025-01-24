@@ -3,8 +3,10 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -19,9 +21,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.AlphaComposite;
-import java.awt.Font;
-import java.awt.RenderingHints;
-
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -109,11 +108,11 @@ public class GamePanel extends JPanel implements Runnable {
         pieces.add(new Ram(RED, 2, 1));
         pieces.add(new Ram(RED, 3, 1));
         pieces.add(new Ram(RED, 4, 1));
-        pieces.add(new Xor(RED, 0, 0));
+        pieces.add(new Tor(RED, 0, 0));
         pieces.add(new Biz(RED, 1, 0));
         pieces.add(new Sau(RED, 2, 0));
         pieces.add(new Biz(RED, 3, 0));
-        pieces.add(new Tor(RED, 4, 0));
+        pieces.add(new Xor(RED, 4, 0));
     }
 
     private void copyPieces(ArrayList<Piece> source, ArrayList<Piece> target) {
@@ -153,13 +152,14 @@ public class GamePanel extends JPanel implements Runnable {
 
                 for(Piece piece : simPieces) {
                     if(piece.color == currentColor &&
-                            piece.col == mouse.x/Board.SQUARE_SIZE && 
-                            piece.row == mouse.y/Board.SQUARE_SIZE) {
+                        piece.col == mouse.x/Board.SQUARE_SIZE && 
+                        piece.row == mouse.y/Board.SQUARE_SIZE) {
 
-                                activeP = piece;
-                            }
+                        activeP = piece;
+                    }
                 }
-            } else {
+            } 
+            else {
                 simulate();
             }
         }
@@ -263,23 +263,19 @@ public class GamePanel extends JPanel implements Runnable {
                         Board.SQUARE_SIZE, Board.SQUARE_SIZE);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
             }
-
-
-
             activeP.draw(g2);
         }
 
-        // status 
+        // Display turn message
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.setFont(new Font("Book Antiqua", Font.PLAIN, 25 ));
+        g2.setFont(new Font("Helvetica", Font.PLAIN, 35));
         g2.setColor(Color.white);
 
-        if(currentColor == BLUE) {
-            g2.drawString("Blue's turn", 530, 550);
-
+        if (currentColor == BLUE) {
+            g2.drawString("Blue's Turn", 510, 600);
         }
         else {
-            g2.drawString("Red's turn", 530, 250);
+            g2.drawString("Red's Turn", 510, 200);
         }
     }
 
@@ -354,7 +350,4 @@ public class GamePanel extends JPanel implements Runnable {
             JOptionPane.showMessageDialog(this, "Failed to load game.");
         }
     }
-
-    
-
 }
