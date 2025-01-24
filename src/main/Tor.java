@@ -11,4 +11,18 @@ public class Tor extends Piece {
             image = getImage("res\\Piece\\RTOR.png");
         }
     }
+
+    @Override
+    public boolean canMove(int targetCol, int targetRow) {
+        if (isWithinBoard(targetCol, targetRow) && isSameSquare(targetCol, targetRow) == false) {
+            if(targetCol == preCol || targetRow == preRow) {
+                if (isValidSquare(targetCol, targetRow)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    
 }
