@@ -2,6 +2,7 @@ package main;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -52,6 +53,9 @@ public class GamePanel extends JPanel implements Runnable {
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.BLACK);
+        setLayout(new BorderLayout());
+
+
         addMouseMotionListener(mouse);
         addMouseListener(mouse);
 
@@ -60,7 +64,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         //Side panel and save game button
         sidePanel = new JPanel();
-        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+        sidePanel.setPreferredSize(new Dimension(290, 10));
+        //sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         sidePanel.setBackground(Color.WHITE);
 
         saveGameButton = new JButton("Save Game");
@@ -74,6 +79,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         this.setLayout(new BorderLayout());
         this.add(sidePanel, BorderLayout.EAST);
+
+        
     }
 
     public void launchGame() {
