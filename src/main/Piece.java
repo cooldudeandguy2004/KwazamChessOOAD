@@ -2,14 +2,12 @@ package main;
 
 import java.awt.Image;
 import java.awt.Graphics2D;
-//import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Piece {
 
-    //public BufferedImage image;
     public Image image;
     public int x, y;
     public int col, row, preCol, preRow;
@@ -37,20 +35,6 @@ public class Piece {
         return img;
     }
     
-
-
-    /*public BufferedImage getImage(String imagePath) {
-        BufferedImage image = null;
-
-        try {
-            image = ImageIO.read(new File(imagePath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return image;
-    }*/
-
     public int getX(int col) {
         return col * Board.SQUARE_SIZE;
     }
@@ -125,18 +109,20 @@ public class Piece {
         }
         return false;
     }
+
+    //Blocks movement if there is a piece on the line
     public boolean pieceIsonStraightLine(int targetCol, int targetRow) {
 
-        // when piece is moving left
+        //Check left
         for(int c = preCol-1; c > targetCol; c--) {
             for(Piece piece : GamePanel.simPieces) {
-                if(piece.col == c && piece.row == targetRow) {
+                if(piece.col == c && piece.row == targetRow) { 
                     hittingP= piece;
                     return true;
                 }
             }
         }
-        // when piece is moving right
+        //Check right
         for(int c = preCol+1; c < targetCol; c++) {
             for(Piece piece : GamePanel.simPieces) {
                 if(piece.col == c && piece.row == targetRow) {
@@ -145,7 +131,7 @@ public class Piece {
                 }
             }
         }
-        // when piece is moving up
+        //Check up
         for(int r = preRow-1; r > targetRow; r--) {
             for(Piece piece : GamePanel.simPieces) {
                 if(piece.col == targetCol && piece.row == r) {
@@ -154,7 +140,7 @@ public class Piece {
                 }
             }
         }
-        // when piece is moving down
+        //Check down
         for(int r = preRow+1; r < targetRow; r++) {
             for(Piece piece : GamePanel.simPieces) {
                 if(piece.col == targetCol && piece.row == r) {
@@ -163,12 +149,13 @@ public class Piece {
                 }
             }
         }
-
         return false;
     }
+
+    //Blocks movement if there is a piece on diagonal line
     public boolean pieceIsOnDiagonalLine(int targetCol, int targetRow) {
         if(targetRow < preRow) {
-            // up left
+            //Check up left
             for(int c = preCol-1; c > targetCol; c-- ) {
                 int diff = Math.abs(c - preCol);
                 for (Piece piece : GamePanel.simPieces) {
@@ -179,7 +166,7 @@ public class Piece {
                 }
             }
 
-            // up right
+            //Check up right
             for(int c = preCol+1; c < targetCol; c++ ) {
                 int diff = Math.abs(c - preCol);
                 for (Piece piece : GamePanel.simPieces) {
@@ -193,7 +180,7 @@ public class Piece {
         }
 
         if(targetRow > preRow) {
-            //down left
+            //Check down left
             for(int c = preCol-1; c > targetCol; c-- ) {
                 int diff = Math.abs(c - preCol);
                 for (Piece piece : GamePanel.simPieces) {
@@ -204,7 +191,7 @@ public class Piece {
                 }
             }
 
-            // down right 
+            //Check down right 
             for(int c = preCol+1; c < targetCol; c++ ) {
                 int diff = Math.abs(c - preCol);
                 for (Piece piece : GamePanel.simPieces) {
@@ -218,6 +205,8 @@ public class Piece {
         }
         return false;
     }
+
+    //Draw piece on board
     public void draw(Graphics2D g2) {
         g2.drawImage(image, x, y, Board.SQUARE_SIZE, Board.SQUARE_SIZE, null);
     }

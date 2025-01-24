@@ -43,33 +43,37 @@ public class GamePanel extends JPanel implements Runnable {
     public static final int BLUE = 0;
     int currentColor = BLUE;
 
-    // BOOLEANS
+    // Booleans
     boolean canMove;
     boolean validSquare;
     boolean change;
 
-    //Save button
+    //Side panel to put save, load, and new game button
     private JPanel sidePanel;
     private JButton saveGameButton;
+    private JButton newGameButton;
+    private JButton loadGameButton;
 
+    //Game over
+    private boolean isGameOver = false;
+
+
+    //Game panel attributes and methods
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.BLACK);
         setLayout(new BorderLayout());
-
-
         addMouseMotionListener(mouse);
         addMouseListener(mouse);
-
         setPieces();
         copyPieces(pieces, simPieces);
 
-        //Side panel and save game button
+        //Side panel
         sidePanel = new JPanel();
         sidePanel.setPreferredSize(new Dimension(290, 10));
-        //sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         sidePanel.setBackground(Color.WHITE);
 
+        //Save button
         saveGameButton = new JButton("Save Game");
         saveGameButton.addActionListener(new ActionListener() {
             @Override
@@ -79,17 +83,40 @@ public class GamePanel extends JPanel implements Runnable {
         });
         sidePanel.add(saveGameButton);
 
+        //New game button
+        newGameButton = new JButton("New Game");
+        newGameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newGame();
+            }
+        });
+        sidePanel.add(newGameButton);
+
+        //Load game button
+        loadGameButton = new JButton("Load Game");
+        loadGameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadGame(null);
+            }
+        });
+        sidePanel.add(loadGameButton);
+        
+
         this.setLayout(new BorderLayout());
         this.add(sidePanel, BorderLayout.EAST);
 
         
     }
 
+    //Launch game method
     public void launchGame() {
         gameThread = new Thread(this);
         gameThread.start();
     }
 
+    //Sets the pieces on the board
     public void setPieces() {
         //Blue Team
         pieces.add(new Ram(BLUE, 0, 6));
@@ -123,9 +150,9 @@ public class GamePanel extends JPanel implements Runnable {
         }
     } 
 
+    //Game loop
     @Override
     public void run() {
-        // Game loop
         double drawInterval = 1000000000 / FPS;
         double delta = 0;
         long lastTime = System.nanoTime();
@@ -146,8 +173,9 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void update() {
+        
 
-        ////// MOUSE BUTTON PRESSED /////
+        //Mouse button pressed
         if(mouse.pressed) {
             if(activeP == null) {
 
@@ -164,7 +192,7 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        ///// MOUSE BUTTON RELEASED ////
+        //Mouse button released
         if(mouse.pressed == false) {
             if(activeP != null) {
 
@@ -172,8 +200,8 @@ public class GamePanel extends JPanel implements Runnable {
 
                     copyPieces(simPieces, pieces) ;
                     activeP.updatePosition();
-
                     changePlayer();
+                    checkForSauCapture(); //Check if Sau has been captured or not
                 }
                 else {
 
@@ -183,7 +211,14 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
         }
+
+        //Check if game is over
+        if (isGameOver) {
+            return;
+        }
     }
+
+
     private void simulate() {
         
         canMove = false;
@@ -208,6 +243,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
+    //Turn counter variable
     private int turnCounter = 0;
 
     private void changePlayer() {
@@ -224,6 +260,7 @@ public class GamePanel extends JPanel implements Runnable {
         activeP = null;
     }
 
+    //Transform method for Xor and Tor
     private void transformPieces() {
         ArrayList<Piece> transformedPieces = new ArrayList<>();
         
@@ -244,6 +281,8 @@ public class GamePanel extends JPanel implements Runnable {
         pieces = transformedPieces;
         copyPieces(pieces, simPieces);
     }
+
+    //Paints the necessary components onto the frame
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -283,6 +322,24 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
+    //Helper method to create piece based on type
+    private Piece createPiece(String pieceType, int color, int col, int row) {
+        switch (pieceType) {
+            case "Ram":
+                return new Ram(color, col, row);
+            case "Xor":
+                return new Xor(color, col, row);
+            case "Biz":
+                return new Biz(color, col, row);
+            case "Sau":
+                return new Sau(color, col, row);
+            case "Tor":
+                return new Tor(color, col, row);
+            default:
+                return null;
+        }
+    }
+
     //Save game method
     public void saveGame() {
         JFileChooser fileChooser = new JFileChooser();
@@ -309,25 +366,17 @@ public class GamePanel extends JPanel implements Runnable {
         }    
     }
 
-    //Helper method to create piece based on type
-    private Piece createPiece(String pieceType, int color, int col, int row) {
-        switch (pieceType) {
-            case "Ram":
-                return new Ram(color, col, row);
-            case "Xor":
-                return new Xor(color, col, row);
-            case "Biz":
-                return new Biz(color, col, row);
-            case "Sau":
-                return new Sau(color, col, row);
-            case "Tor":
-                return new Tor(color, col, row);
-            default:
-                return null;
-        }
-    }
-
+    //Load game method
     public void loadGame(String filePath) {
+        if (filePath == null) {
+            JFileChooser fileChooser = new JFileChooser();
+            int returnValue = fileChooser.showOpenDialog(this);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                filePath = fileChooser.getSelectedFile().getAbsolutePath();
+            } else {
+                return;
+            }
+        }
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             pieces.clear(); //Clear current game pieces
             String line = reader.readLine();
@@ -352,6 +401,48 @@ public class GamePanel extends JPanel implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Failed to load game.");
+        }
+    }
+
+    //New game method
+    private void newGame() {
+        int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to start a new game? All progress will be lost.", "New Game Confirmation", JOptionPane.YES_NO_OPTION
+        );
+        if (confirmation == JOptionPane.YES_NO_OPTION) {
+            pieces.clear(); //Clear pieces and reset game state
+            simPieces.clear();
+            transformedPieces.clear(); //Reset any transformed pieces
+            setPieces(); //Reput the pieces 
+            currentColor = BLUE; //Reset current player to blue
+            activeP = null;
+            canMove = false; //Reset movement flag
+            validSquare = false;
+            turnCounter = 0; //Reset turn couner
+            copyPieces(pieces, simPieces); //Reinitialize pieces to new game state
+            repaint();
+        }
+    }
+
+
+    private void checkForSauCapture() {
+        Piece sauCaptured = null;
+
+        //Check if Sau has been captured
+        for (Piece piece : simPieces) {
+            if (piece instanceof Sau) {
+                //If Sau's remoed from the board
+                if (piece.hittingP != null && !simPieces.contains(piece)) {
+                    sauCaptured = piece;
+                    break;
+                }
+            }
+        }
+
+        if (sauCaptured != null) {
+            String winner = (sauCaptured.color == BLUE) ? "Red" : "Blue"; //Determine and display which color is the winner
+            JOptionPane.showMessageDialog(this, "Congrats! " + winner + " has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+
+            isGameOver = true;
         }
     }
 
