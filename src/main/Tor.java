@@ -11,4 +11,16 @@ public class Tor extends Piece {
             image = getImage("res\\Piece\\RTOR.png");
         }
     }
+
+    public boolean canMove(int targetCol, int targetRow) {
+        if (isWithinBoard(targetCol, targetRow) && isSameSquare(targetCol, targetRow) == false) {
+            // Tor can move orthogonally for any distance. It cannot skip over other pieces
+            if (targetCol == preCol || targetRow == preRow) {
+                if (isValidSquare(targetCol, targetRow) && pieceIsOnStraightLine(targetCol, targetRow) == false) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
