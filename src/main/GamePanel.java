@@ -21,6 +21,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.AlphaComposite;
+import java.awt.Font;
+import java.awt.RenderingHints;
 
 
 public class GamePanel extends JPanel implements Runnable {
@@ -35,6 +37,7 @@ public class GamePanel extends JPanel implements Runnable {
     //Pieces
     public static ArrayList<Piece> pieces = new ArrayList<>();
     public static ArrayList<Piece> simPieces = new ArrayList<>();
+    ArrayList<Piece> transformedPieces = new ArrayList<>();
     Piece activeP;
 
     // Color
@@ -45,6 +48,7 @@ public class GamePanel extends JPanel implements Runnable {
     // BOOLEANS
     boolean canMove;
     boolean validSquare;
+    boolean change;
 
     //Save button
     private JPanel sidePanel;
@@ -170,6 +174,8 @@ public class GamePanel extends JPanel implements Runnable {
 
                     copyPieces(simPieces, pieces) ;
                     activeP.updatePosition();
+
+                    changePlayer();
                 }
                 else {
 
@@ -204,6 +210,42 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
+    private int turnCounter = 0;
+
+    private void changePlayer() {
+        if (currentColor == BLUE) {
+            currentColor = RED;
+        } else {
+            currentColor = BLUE;
+            turnCounter++;  // Increment after both Blue and Red move
+    
+            if (turnCounter % 1 == 0) { 
+                transformPieces();
+            }
+        }
+        activeP = null;
+    }
+
+    private void transformPieces() {
+        ArrayList<Piece> transformedPieces = new ArrayList<>();
+        
+        for (Piece piece : pieces) {
+            if (piece instanceof Tor) {
+                transformedPieces.add(new Xor(piece.color, piece.col, piece.row));
+            } else if (piece instanceof Xor) {
+                transformedPieces.add(new Tor(piece.color, piece.col, piece.row));
+            } else {
+                transformedPieces.add(piece);  // Keep other pieces unchanged
+            }
+        }
+    
+        pieces = transformedPieces;
+        copyPieces(pieces, simPieces);
+    
+    
+        pieces = transformedPieces;
+        copyPieces(pieces, simPieces);
+    }
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -217,7 +259,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         if(activeP != null) {
             if(canMove) {
-                g2.setColor(Color.white);
+                g2.setColor(Color.blue);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7F));
                 g2.fillRect(activeP.col*Board.SQUARE_SIZE, activeP.row*Board.SQUARE_SIZE,
                         Board.SQUARE_SIZE, Board.SQUARE_SIZE);
@@ -227,6 +269,19 @@ public class GamePanel extends JPanel implements Runnable {
 
 
             activeP.draw(g2);
+        }
+
+        // status 
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2.setFont(new Font("Book Antiqua", Font.PLAIN, 25 ));
+        g2.setColor(Color.white);
+
+        if(currentColor == BLUE) {
+            g2.drawString("Blue's turn", 530, 550);
+
+        }
+        else {
+            g2.drawString("Red's turn", 530, 250);
         }
     }
 
