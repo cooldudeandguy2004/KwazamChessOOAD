@@ -173,6 +173,9 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void update() {
+        if (isGameOver) {
+            return;
+        }
         
 
         //Mouse button pressed
@@ -210,11 +213,6 @@ public class GamePanel extends JPanel implements Runnable {
                     activeP = null;
                 }
             }
-        }
-
-        //Check if game is over
-        if (isGameOver) {
-            return;
         }
     }
 
@@ -425,12 +423,34 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     private void checkForSauCapture() {
-        Piece sauCaptured = null;
+        //Piece sauCaptured = null;
 
-        //Check if Sau has been captured
+        boolean sauExistsBlue = false;
+        boolean sauExistsRed = false;
+
+        for (Piece piece : pieces) {
+            if (piece instanceof Sau) {
+                if (piece.color == BLUE) {
+                    sauExistsBlue = true;
+                } else if (piece.color == RED) {
+                    sauExistsRed = true;
+                }
+            }
+        }
+
+        if (!sauExistsBlue) {
+            JOptionPane.showMessageDialog(this, "Congrats! Red has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+            isGameOver = true;
+        } else if (!sauExistsRed) {
+            JOptionPane.showMessageDialog(this, "Congrats! Blue has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+            isGameOver = true;
+        }
+
+
+        /*Check if Sau has been captured
         for (Piece piece : simPieces) {
             if (piece instanceof Sau) {
-                //If Sau's remoed from the board
+                //If Sau's remobed from the board
                 if (piece.hittingP != null && !simPieces.contains(piece)) {
                     sauCaptured = piece;
                     break;
@@ -443,7 +463,7 @@ public class GamePanel extends JPanel implements Runnable {
             JOptionPane.showMessageDialog(this, "Congrats! " + winner + " has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
 
             isGameOver = true;
-        }
+        }*/
     }
 
     
