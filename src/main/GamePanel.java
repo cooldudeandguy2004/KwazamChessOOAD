@@ -1,4 +1,4 @@
-package main;
+package src.main;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -172,76 +172,67 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
-    private void update() {
-        
+private void update() {
+    if (isGameOver) {
+        return;  // Stop updates when the game is over
+    }
 
-        //Mouse button pressed
-        if(mouse.pressed) {
-            if(activeP == null) {
-
-                for(Piece piece : simPieces) {
-                    if(piece.color == currentColor &&
-                            piece.col == mouse.x/Board.SQUARE_SIZE && 
-                            piece.row == mouse.y/Board.SQUARE_SIZE) {
-
-                                activeP = piece;
-                            }
-                }
-            } else {
-                simulate();
-            }
-        }
-
-        //Mouse button released
-        if(mouse.pressed == false) {
-            if(activeP != null) {
-
-                if(validSquare) {
-
-                    copyPieces(simPieces, pieces) ;
-                    activeP.updatePosition();
-                    changePlayer();
-                    checkForSauCapture(); //Check if Sau has been captured or not
-                }
-                else {
-
-                    copyPieces(pieces, simPieces);
-                    activeP.resetPosition();
-                    activeP = null;
+    // Mouse button pressed
+    if (mouse.pressed) {
+        if (activeP == null) {
+            for (Piece piece : simPieces) {
+                if (piece.color == currentColor &&
+                        piece.col == mouse.x / Board.SQUARE_SIZE &&
+                        piece.row == mouse.y / Board.SQUARE_SIZE) {
+                    activeP = piece;
                 }
             }
-        }
-
-        //Check if game is over
-        if (isGameOver) {
-            return;
+        } else {
+            simulate();
         }
     }
+
+    // Mouse button released
+    if (!mouse.pressed && activeP != null) {
+        if (validSquare) {
+            copyPieces(simPieces, pieces);
+            activeP.updatePosition();
+            changePlayer();
+            checkForSauCapture(); // Check if Sau has been captured or not
+        } else {
+            copyPieces(pieces, simPieces);
+            activeP.resetPosition();
+            activeP = null;
+        }
+    }
+}
+
 
 
     private void simulate() {
-        
-        canMove = false;
-        validSquare = false;
-
-        copyPieces(pieces, simPieces);
-
-        activeP.x = mouse.x - Board.HALF_SQUARE_SIZE;
-        activeP.y = mouse.y - Board.HALF_SQUARE_SIZE;
-        activeP.col = activeP.getCol(activeP.x);
-        activeP.row = activeP.getRow(activeP.y);
-
-        if(activeP.canMove(activeP.col, activeP.row)) {
-
-            canMove = true;
-
-            if(activeP.hittingP != null) {
-                simPieces.remove(activeP.hittingP.getIndex()) ;
-            }
-            validSquare = true;
-        }
-
+    if (isGameOver) {
+        return;  // Stop piece simulation when the game is over
     }
+
+    canMove = false;
+    validSquare = false;
+
+    copyPieces(pieces, simPieces);
+
+    activeP.x = mouse.x - Board.HALF_SQUARE_SIZE;
+    activeP.y = mouse.y - Board.HALF_SQUARE_SIZE;
+    activeP.col = activeP.getCol(activeP.x);
+    activeP.row = activeP.getRow(activeP.y);
+
+    if (activeP.canMove(activeP.col, activeP.row)) {
+        canMove = true;
+        if (activeP.hittingP != null) {
+            simPieces.remove(activeP.hittingP.getIndex());
+        }
+        validSquare = true;
+    }
+}
+
 
     //Turn counter variable
     private int turnCounter = 0;
@@ -424,28 +415,53 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
 
-    private void checkForSauCapture() {
-        Piece sauCaptured = null;
+private void resetGame() {
+    pieces.clear();
+    simPieces.clear();
+    transformedPieces.clear();
+    setPieces();
+    currentColor = BLUE;
+    activeP = null;
+    canMove = false;
+    validSquare = false;
+    turnCounter = 0;
+    isGameOver = false;  // Reset game-over flag
+    copyPieces(pieces, simPieces);
+    repaint();
+}
 
-        //Check if Sau has been captured
-        for (Piece piece : simPieces) {
-            if (piece instanceof Sau) {
-                //If Sau's remoed from the board
-                if (piece.hittingP != null && !simPieces.contains(piece)) {
-                    sauCaptured = piece;
-                    break;
-                }
+
+private void checkForSauCapture() {
+    int blueSauCount = 0;
+    int redSauCount = 0;
+
+    // Count the number of Sau pieces remaining on the board
+    for (Piece piece : pieces) {
+        if (piece instanceof Sau) {
+            if (piece.color == BLUE) {
+                blueSauCount++;
+            } else {
+                redSauCount++;
             }
-        }
-
-        if (sauCaptured != null) {
-            String winner = (sauCaptured.color == BLUE) ? "Red" : "Blue"; //Determine and display which color is the winner
-            JOptionPane.showMessageDialog(this, "Congrats! " + winner + " has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
-
-            isGameOver = true;
         }
     }
 
-    
+    if (blueSauCount == 0) {
+        JOptionPane.showMessageDialog(this, "Congrats! Red has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+        isGameOver = true;
+    } else if (redSauCount == 0) {
+        JOptionPane.showMessageDialog(this, "Congrats! Blue has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+        isGameOver = true;
+    }
+}
 
 }
+
+
+
+
+
+
+    
+
+
