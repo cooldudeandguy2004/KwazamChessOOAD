@@ -253,7 +253,7 @@ public class GamePanel extends JPanel implements Runnable {
             currentColor = BLUE;
             turnCounter++;  // Increment after both Blue and Red move
     
-            if (turnCounter % 1 == 0) { 
+            if (turnCounter % 2 == 0) { 
                 transformPieces();
             }
         }
