@@ -1,5 +1,8 @@
 package main;
 
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+
 public class Ram extends Piece {
 
     public Ram(int color, int col, int row) {
@@ -39,5 +42,17 @@ public class Ram extends Piece {
             }
         }
         return false;
+    }
+
+    @Override
+    public void draw(Graphics2D g2) {
+        AffineTransform at = AffineTransform.getTranslateInstance(x, y);
+        at.scale(Board.SQUARE_SIZE / (double) image.getWidth(null), Board.SQUARE_SIZE / (double) image.getHeight(null));
+
+        // Rotate 180 degrees if moveFactor is -1
+        if (moveFactor == -1) {
+            at.rotate(Math.toRadians(180), image.getWidth(null) / 2.0, image.getHeight(null) / 2.0);
+        }
+        g2.drawImage(image, at, null);
     }
 }
