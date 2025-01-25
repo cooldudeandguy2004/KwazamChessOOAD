@@ -22,7 +22,6 @@ import java.awt.AlphaComposite;
 import java.awt.Font;
 import java.awt.RenderingHints;
 
-
 public class GamePanel extends JPanel implements Runnable {
 
     public static final int WIDTH = 800;
@@ -32,7 +31,7 @@ public class GamePanel extends JPanel implements Runnable {
     Board board = new Board();
     Mouse mouse = new Mouse();
 
-    //Pieces
+    // Pieces
     public static ArrayList<Piece> pieces = new ArrayList<>();
     public static ArrayList<Piece> simPieces = new ArrayList<>();
     ArrayList<Piece> transformedPieces = new ArrayList<>();
@@ -48,17 +47,16 @@ public class GamePanel extends JPanel implements Runnable {
     boolean validSquare;
     boolean change;
 
-    //Side panel to put save, load, and new game button
+    // Side panel to put save, load, and new game button
     private JPanel sidePanel;
     private JButton saveGameButton;
     private JButton newGameButton;
     private JButton loadGameButton;
 
-    //Game over
+    // Game over
     private boolean isGameOver = false;
 
-
-    //Game panel attributes and methods
+    // Game panel attributes and methods
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.BLACK);
@@ -68,12 +66,12 @@ public class GamePanel extends JPanel implements Runnable {
         setPieces();
         copyPieces(pieces, simPieces);
 
-        //Side panel
+        // Side panel
         sidePanel = new JPanel();
         sidePanel.setPreferredSize(new Dimension(290, 10));
         sidePanel.setBackground(Color.WHITE);
 
-        //Save button
+        // Save button
         saveGameButton = new JButton("Save Game");
         saveGameButton.addActionListener(new ActionListener() {
             @Override
@@ -83,7 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
         });
         sidePanel.add(saveGameButton);
 
-        //New game button
+        // New game button
         newGameButton = new JButton("New Game");
         newGameButton.addActionListener(new ActionListener() {
             @Override
@@ -93,7 +91,7 @@ public class GamePanel extends JPanel implements Runnable {
         });
         sidePanel.add(newGameButton);
 
-        //Load game button
+        // Load game button
         loadGameButton = new JButton("Load Game");
         loadGameButton.addActionListener(new ActionListener() {
             @Override
@@ -102,23 +100,21 @@ public class GamePanel extends JPanel implements Runnable {
             }
         });
         sidePanel.add(loadGameButton);
-        
 
         this.setLayout(new BorderLayout());
         this.add(sidePanel, BorderLayout.EAST);
 
-        
     }
 
-    //Launch game method
+    // Launch game method
     public void launchGame() {
         gameThread = new Thread(this);
         gameThread.start();
     }
 
-    //Sets the pieces on the board
+    // Sets the pieces on the board
     public void setPieces() {
-        //Blue Team
+        // Blue Team
         pieces.add(new Ram(BLUE, 0, 6));
         pieces.add(new Ram(BLUE, 1, 6));
         pieces.add(new Ram(BLUE, 2, 6));
@@ -130,7 +126,7 @@ public class GamePanel extends JPanel implements Runnable {
         pieces.add(new Biz(BLUE, 3, 7));
         pieces.add(new Tor(BLUE, 4, 7));
 
-        //Red Team
+        // Red Team
         pieces.add(new Ram(RED, 0, 1));
         pieces.add(new Ram(RED, 1, 1));
         pieces.add(new Ram(RED, 2, 1));
@@ -148,9 +144,9 @@ public class GamePanel extends JPanel implements Runnable {
         for (int i = 0; i < source.size(); i++) {
             target.add(source.get(i));
         }
-    } 
+    }
 
-    //Game loop
+    // Game loop
     @Override
     public void run() {
         double drawInterval = 1000000000 / FPS;
@@ -172,69 +168,66 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
-private void update() {
-    if (isGameOver) {
-        return;  // Stop updates when the game is over
-    }
+    private void update() {
+        if (isGameOver) {
+            return; // Stop updates when the game is over
+        }
 
-    // Mouse button pressed
-    if (mouse.pressed) {
-        if (activeP == null) {
-            for (Piece piece : simPieces) {
-                if (piece.color == currentColor &&
-                        piece.col == mouse.x / Board.SQUARE_SIZE &&
-                        piece.row == mouse.y / Board.SQUARE_SIZE) {
-                    activeP = piece;
+        // Mouse button pressed
+        if (mouse.pressed) {
+            if (activeP == null) {
+                for (Piece piece : simPieces) {
+                    if (piece.color == currentColor &&
+                            piece.col == mouse.x / Board.SQUARE_SIZE &&
+                            piece.row == mouse.y / Board.SQUARE_SIZE) {
+                        activeP = piece;
+                    }
                 }
+            } else {
+                simulate();
             }
-        } else {
-            simulate();
+        }
+
+        // Mouse button released
+        if (!mouse.pressed && activeP != null) {
+            if (validSquare) {
+                copyPieces(simPieces, pieces);
+                activeP.updatePosition();
+                changePlayer();
+                checkForSauCapture(); // Check if Sau has been captured or not
+            } else {
+                copyPieces(pieces, simPieces);
+                activeP.resetPosition();
+                activeP = null;
+            }
         }
     }
-
-    // Mouse button released
-    if (!mouse.pressed && activeP != null) {
-        if (validSquare) {
-            copyPieces(simPieces, pieces);
-            activeP.updatePosition();
-            changePlayer();
-            checkForSauCapture(); // Check if Sau has been captured or not
-        } else {
-            copyPieces(pieces, simPieces);
-            activeP.resetPosition();
-            activeP = null;
-        }
-    }
-}
-
-
 
     private void simulate() {
-    if (isGameOver) {
-        return;  // Stop piece simulation when the game is over
-    }
-
-    canMove = false;
-    validSquare = false;
-
-    copyPieces(pieces, simPieces);
-
-    activeP.x = mouse.x - Board.HALF_SQUARE_SIZE;
-    activeP.y = mouse.y - Board.HALF_SQUARE_SIZE;
-    activeP.col = activeP.getCol(activeP.x);
-    activeP.row = activeP.getRow(activeP.y);
-
-    if (activeP.canMove(activeP.col, activeP.row)) {
-        canMove = true;
-        if (activeP.hittingP != null) {
-            simPieces.remove(activeP.hittingP.getIndex());
+        if (isGameOver) {
+            return; // Stop piece simulation when the game is over
         }
-        validSquare = true;
+
+        canMove = false;
+        validSquare = false;
+
+        copyPieces(pieces, simPieces);
+
+        activeP.x = mouse.x - Board.HALF_SQUARE_SIZE;
+        activeP.y = mouse.y - Board.HALF_SQUARE_SIZE;
+        activeP.col = activeP.getCol(activeP.x);
+        activeP.row = activeP.getRow(activeP.y);
+
+        if (activeP.canMove(activeP.col, activeP.row)) {
+            canMove = true;
+            if (activeP.hittingP != null) {
+                simPieces.remove(activeP.hittingP.getIndex());
+            }
+            validSquare = true;
+        }
     }
-}
 
-
-    //Turn counter variable
+    // Turn counter variable
     private int turnCounter = 0;
 
     private void changePlayer() {
@@ -242,78 +235,74 @@ private void update() {
             currentColor = RED;
         } else {
             currentColor = BLUE;
-            turnCounter++;  // Increment after both Blue and Red move
-    
-            if (turnCounter % 2 == 0) { 
+            turnCounter++; // Increment after both Blue and Red move
+
+            if (turnCounter % 2 == 0) {
                 transformPieces();
             }
         }
         activeP = null;
     }
 
-    //Transform method for Xor and Tor
+    // Transform method for Xor and Tor
     private void transformPieces() {
         ArrayList<Piece> transformedPieces = new ArrayList<>();
-        
+
         for (Piece piece : pieces) {
             if (piece instanceof Tor) {
                 transformedPieces.add(new Xor(piece.color, piece.col, piece.row));
             } else if (piece instanceof Xor) {
                 transformedPieces.add(new Tor(piece.color, piece.col, piece.row));
             } else {
-                transformedPieces.add(piece);  // Keep other pieces unchanged
+                transformedPieces.add(piece); // Keep other pieces unchanged
             }
         }
-    
+
         pieces = transformedPieces;
         copyPieces(pieces, simPieces);
-    
-    
+
         pieces = transformedPieces;
         copyPieces(pieces, simPieces);
     }
 
-    //Paints the necessary components onto the frame
+    // Paints the necessary components onto the frame
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
-        //Board
+        // Board
         board.draw(g2);
-        //Pieces
+        // Pieces
         for (Piece p : simPieces) {
             p.draw(g2);
         }
 
-        if(activeP != null) {
-            if(canMove) {
+        if (activeP != null) {
+            if (canMove) {
                 g2.setColor(Color.blue);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7F));
-                g2.fillRect(activeP.col*Board.SQUARE_SIZE, activeP.row*Board.SQUARE_SIZE,
+                g2.fillRect(activeP.col * Board.SQUARE_SIZE, activeP.row * Board.SQUARE_SIZE,
                         Board.SQUARE_SIZE, Board.SQUARE_SIZE);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
             }
 
-
-
             activeP.draw(g2);
         }
 
-        // status 
+        // status
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2.setFont(new Font("Book Antiqua", Font.PLAIN, 25 ));
+        g2.setFont(new Font("Book Antiqua", Font.PLAIN, 25));
         g2.setColor(Color.white);
 
-        if(currentColor == BLUE) {
+        if (currentColor == BLUE) {
             g2.drawString("Blue's turn", 530, 550);
 
-        }
-        else {
+        } else {
             g2.drawString("Red's turn", 530, 250);
         }
     }
 
-    //Helper method to create piece based on type
+    // Helper method to create piece based on type
     private Piece createPiece(String pieceType, int color, int col, int row) {
         switch (pieceType) {
             case "Ram":
@@ -331,33 +320,33 @@ private void update() {
         }
     }
 
-    //Save game method
+    // Save game method
     public void saveGame() {
         JFileChooser fileChooser = new JFileChooser();
         int returnValue = fileChooser.showSaveDialog(this);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
 
-
-            //Check if file does not have .txt and add it
+            // Check if file does not have .txt and add it
             if (!selectedFile.getName().endsWith(".txt")) {
                 selectedFile = new File(selectedFile.getParent(), selectedFile.getName() + ".txt");
             }
-            
+
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(selectedFile))) {
                 writer.write("CurrentColor: " + currentColor + "\n");
                 for (Piece piece : pieces) {
-                    writer.write(piece.getClass().getSimpleName() + "," + piece.color + "," + piece.col + "," + piece.row + "\n");
+                    writer.write(piece.getClass().getSimpleName() + "," + piece.color + "," + piece.col + ","
+                            + piece.row + "\n");
                 }
                 JOptionPane.showMessageDialog(this, "Game saved successfully.");
             } catch (IOException e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Failed to save game.");
             }
-        }    
+        }
     }
 
-    //Load game method
+    // Load game method
     public void loadGame(String filePath) {
         if (filePath == null) {
             JFileChooser fileChooser = new JFileChooser();
@@ -369,7 +358,7 @@ private void update() {
             }
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            pieces.clear(); //Clear current game pieces
+            pieces.clear(); // Clear current game pieces
             String line = reader.readLine();
             if (line != null && line.startsWith("CurrentColor: ")) {
                 currentColor = Integer.parseInt(line.split(":")[1].trim());
@@ -388,6 +377,7 @@ private void update() {
 
             copyPieces(pieces, simPieces);
             JOptionPane.showMessageDialog(this, "Game loaded successfully.");
+            launchGame();
             repaint();
         } catch (IOException e) {
             e.printStackTrace();
@@ -395,73 +385,65 @@ private void update() {
         }
     }
 
-    //New game method
+    // New game method
     private void newGame() {
-        int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to start a new game? All progress will be lost.", "New Game Confirmation", JOptionPane.YES_NO_OPTION
-        );
+        int confirmation = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to start a new game? All progress will be lost.", "New Game Confirmation",
+                JOptionPane.YES_NO_OPTION);
         if (confirmation == JOptionPane.YES_NO_OPTION) {
-            pieces.clear(); //Clear pieces and reset game state
+            pieces.clear(); // Clear pieces and reset game state
             simPieces.clear();
-            transformedPieces.clear(); //Reset any transformed pieces
-            setPieces(); //Reput the pieces 
-            currentColor = BLUE; //Reset current player to blue
+            transformedPieces.clear(); // Reset any transformed pieces
+            setPieces(); // Reput the pieces
+            currentColor = BLUE; // Reset current player to blue
             activeP = null;
-            canMove = false; //Reset movement flag
+            canMove = false; // Reset movement flag
             validSquare = false;
-            turnCounter = 0; //Reset turn couner
-            copyPieces(pieces, simPieces); //Reinitialize pieces to new game state
+            turnCounter = 0; // Reset turn couner
+            copyPieces(pieces, simPieces); // Reinitialize pieces to new game state
+            launchGame();
             repaint();
         }
     }
 
+    /*private void resetGame() {
+        pieces.clear();
+        simPieces.clear();
+        transformedPieces.clear();
+        setPieces();
+        currentColor = BLUE;
+        activeP = null;
+        canMove = false;
+        validSquare = false;
+        turnCounter = 0;
+        isGameOver = false; // Reset game-over flag
+        copyPieces(pieces, simPieces);
+        repaint();
+    }*/
 
-private void resetGame() {
-    pieces.clear();
-    simPieces.clear();
-    transformedPieces.clear();
-    setPieces();
-    currentColor = BLUE;
-    activeP = null;
-    canMove = false;
-    validSquare = false;
-    turnCounter = 0;
-    isGameOver = false;  // Reset game-over flag
-    copyPieces(pieces, simPieces);
-    repaint();
-}
+    private void checkForSauCapture() {
+        int blueSauCount = 0;
+        int redSauCount = 0;
 
-
-private void checkForSauCapture() {
-    int blueSauCount = 0;
-    int redSauCount = 0;
-
-    // Count the number of Sau pieces remaining on the board
-    for (Piece piece : pieces) {
-        if (piece instanceof Sau) {
-            if (piece.color == BLUE) {
-                blueSauCount++;
-            } else {
-                redSauCount++;
+        // Count the number of Sau pieces remaining on the board
+        for (Piece piece : pieces) {
+            if (piece instanceof Sau) {
+                if (piece.color == BLUE) {
+                    blueSauCount++;
+                } else {
+                    redSauCount++;
+                }
             }
+        }
+
+        if (blueSauCount == 0) {
+            JOptionPane.showMessageDialog(this, "Congrats! Red has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+            isGameOver = true;
+        } else if (redSauCount == 0) {
+            JOptionPane.showMessageDialog(this, "Congrats! Blue has won!", "Game Over",
+                    JOptionPane.INFORMATION_MESSAGE);
+            isGameOver = true;
         }
     }
 
-    if (blueSauCount == 0) {
-        JOptionPane.showMessageDialog(this, "Congrats! Red has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
-        isGameOver = true;
-    } else if (redSauCount == 0) {
-        JOptionPane.showMessageDialog(this, "Congrats! Blue has won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
-        isGameOver = true;
-    }
 }
-
-}
-
-
-
-
-
-
-    
-
-
