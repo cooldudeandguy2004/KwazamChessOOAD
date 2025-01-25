@@ -24,8 +24,8 @@ import java.awt.RenderingHints;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 900;
+    public static final int WIDTH = 600;
+    public static final int HEIGHT = 750;
     final int FPS = 60;
     Thread gameThread;
     Board board = new Board();
@@ -68,7 +68,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Side panel
         sidePanel = new JPanel();
-        sidePanel.setPreferredSize(new Dimension(290, 10));
+        sidePanel.setPreferredSize(new Dimension(142, 10));
         sidePanel.setBackground(Color.WHITE);
 
         // Save button
