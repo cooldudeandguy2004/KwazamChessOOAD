@@ -1,6 +1,9 @@
 package main;
 
 import java.awt.Image;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
@@ -204,6 +207,20 @@ public class Piece {
 
         }
         return false;
+    }
+
+    public Image rotateImage180(Image img) {
+        if (img instanceof BufferedImage) {
+            BufferedImage bufferedImg = (BufferedImage) img;
+            int width = bufferedImg.getWidth();
+            int height = bufferedImg.getHeight();
+
+            AffineTransform transform = AffineTransform.getRotateInstance(Math.PI, width / 2.0, height / 2.0);
+            AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
+
+            return op.filter(bufferedImg, null);
+        }
+        return img;
     }
 
     //Draw piece on board

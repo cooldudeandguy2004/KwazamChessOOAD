@@ -16,7 +16,9 @@ public class Ram extends Piece {
     int moveFactor = 1;
     private int changeDirection() {
         if (preRow == 0 || preRow == 7) {
+            rotateImage();
             moveFactor = moveFactor * -1;
+            
         }
         return moveFactor;
     }
@@ -39,5 +41,10 @@ public class Ram extends Piece {
             }
         }
         return false;
+    }
+
+    //Rotate image 180 degrees after reaching end
+    private void rotateImage() {
+        image = rotateImage180(image);
     }
 }
