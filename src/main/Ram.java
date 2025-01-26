@@ -3,7 +3,7 @@ package main;
 public class Ram extends Piece {
 
     public Ram(int color, int col, int row) {
-        super(color, col, row);
+        super(color, col, row, "RAM");
 
         if (color == GamePanel.BLUE) {
             image = getImage("res\\Piece\\BRAM.png");
@@ -14,11 +14,12 @@ public class Ram extends Piece {
 
     // Change direction once piece reach the end
     int moveFactor = 1;
+
     private int changeDirection() {
         if (preRow == 0 || preRow == 7) {
             rotateImage();
             moveFactor = moveFactor * -1;
-            
+
         }
         return moveFactor;
     }
@@ -29,8 +30,7 @@ public class Ram extends Piece {
             int moveValue;
             if (color == GamePanel.BLUE) {
                 moveValue = -1;
-            }
-            else {
+            } else {
                 moveValue = 1;
             }
             // Ram can only move 1 step forward
@@ -43,7 +43,7 @@ public class Ram extends Piece {
         return false;
     }
 
-    //Rotate image 180 degrees after reaching end
+    // Rotate image 180 degrees after reaching end
     private void rotateImage() {
         image = rotateImage180(image);
     }

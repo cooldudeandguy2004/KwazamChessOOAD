@@ -15,19 +15,19 @@ public class MainMenu extends JPanel {
     private JFrame window;
     private Image backgroundImage;
 
-    //Sets the mainmenu window
+    // Sets the mainmenu window
     public MainMenu(JFrame window) {
         this.window = window;
-        setLayout(null);//setLayout(new GridLayout(3, 1));
+        setLayout(null);// setLayout(new GridLayout(3, 1));
 
-        //Load background image
+        // Load background image
         try {
             backgroundImage = ImageIO.read(new File("res\\chessback.jpg"));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //Create the title on the main menu
+        // Create the title on the main menu
         JLabel title = new JLabel("Kwazam Chess", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 36));
         title.setOpaque(false);
@@ -35,8 +35,7 @@ public class MainMenu extends JPanel {
         title.setBounds(100, 50, 600, 50);
         add(title);
 
-
-        //Create the new game button
+        // Create the new game button
         JButton newGameButton = createButton("New Game", 0, 400);
         newGameButton.addActionListener(new ActionListener() {
             @Override
@@ -46,8 +45,7 @@ public class MainMenu extends JPanel {
         });
         add(newGameButton);
 
-        
-        //Create the load game button
+        // Create the load game button
         JButton loadGameButton = createButton("Load Game", 0, 500);
         loadGameButton.addActionListener(new ActionListener() {
             @Override
@@ -59,10 +57,10 @@ public class MainMenu extends JPanel {
 
         revalidate();
         repaint();
-        
+
     }
 
-    //Create button
+    // Create button
     private JButton createButton(String text, int x, int y) {
         JButton button = new JButton(text);
         button.setFont(new Font("Helvetica", Font.BOLD, 24));
@@ -73,7 +71,7 @@ public class MainMenu extends JPanel {
         button.setFocusPainted(false);
         button.setBounds(x, y, 150, 40);
 
-        //Hovering mouse effect
+        // Hovering mouse effect
         button.addMouseListener(new MouseAdapter() {
             private final Font defaultFont = button.getFont();
             private final Font hoverFont = defaultFont.deriveFont(defaultFont.getStyle(), defaultFont.getSize() + 2);
@@ -96,7 +94,7 @@ public class MainMenu extends JPanel {
         return button;
     }
 
-    //Paints the background image
+    // Paints the background image
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -105,7 +103,7 @@ public class MainMenu extends JPanel {
         }
     }
 
-    //Method for when clicking new game
+    // Method for when clicking new game
     private void startNewGame() {
         window.getContentPane().removeAll();
         GamePanel gp = new GamePanel();
@@ -119,7 +117,7 @@ public class MainMenu extends JPanel {
         gp.launchGame();
     }
 
-    //Method for when clicking load game
+    // Method for when clicking load game
     private void loadGame() {
 
         JFileChooser fileChooser = new JFileChooser();
@@ -138,6 +136,5 @@ public class MainMenu extends JPanel {
             gp.loadGame(selectedFile.getPath());
         }
     }
-
 
 }
