@@ -55,6 +55,12 @@ public class GamePanel extends JPanel implements Runnable {
     // Game over
     private boolean isGameOver = false;
 
+    //Command design pattern fields
+    private Command saveGameCommand;
+    private Command newGameCommand;
+    private Command loadGameCommand;
+    
+
     // Game panel attributes and methods
     public GamePanel() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -70,12 +76,17 @@ public class GamePanel extends JPanel implements Runnable {
         sidePanel.setPreferredSize(new Dimension(142, 10));
         sidePanel.setBackground(Color.WHITE);
 
+        //Initialize commands
+        saveGameCommand = new SaveGameCommand(this);
+        loadGameCommand = new LoadGameCommand(this);
+        newGameCommand = new NewGameCommand(this);
+
         // Save button
         saveGameButton = new JButton("Save Game");
         saveGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                saveGame();
+                saveGameCommand.execute();
             }
         });
         sidePanel.add(saveGameButton);
@@ -85,7 +96,7 @@ public class GamePanel extends JPanel implements Runnable {
         newGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                newGame();
+                newGameCommand.execute();
             }
         });
         sidePanel.add(newGameButton);
@@ -95,7 +106,7 @@ public class GamePanel extends JPanel implements Runnable {
         loadGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loadGame(null);
+                loadGameCommand.execute();
             }
         });
         sidePanel.add(loadGameButton);
@@ -382,7 +393,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     // New game method
-    private void newGame() {
+    public void newGame() {
         int confirmation = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to start a new game? All progress will be lost.", "New Game Confirmation",
                 JOptionPane.YES_NO_OPTION);
@@ -401,21 +412,6 @@ public class GamePanel extends JPanel implements Runnable {
             repaint();
         }
     }
-
-    /*private void resetGame() {
-        pieces.clear();
-        simPieces.clear();
-        transformedPieces.clear();
-        setPieces();
-        currentColor = BLUE;
-        activeP = null;
-        canMove = false;
-        validSquare = false;
-        turnCounter = 0;
-        isGameOver = false; // Reset game-over flag
-        copyPieces(pieces, simPieces);
-        repaint();
-    }*/
 
     private void checkForSauCapture() {
         int blueSauCount = 0;
