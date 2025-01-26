@@ -45,7 +45,6 @@ public class GamePanel extends JPanel implements Runnable {
     // Booleans
     boolean canMove;
     boolean validSquare;
-    boolean change;
 
     // Side panel to put save, load, and new game button
     private JPanel sidePanel;
@@ -257,9 +256,6 @@ public class GamePanel extends JPanel implements Runnable {
                 transformedPieces.add(piece); // Keep other pieces unchanged
             }
         }
-
-        pieces = transformedPieces;
-        copyPieces(pieces, simPieces);
 
         pieces = transformedPieces;
         copyPieces(pieces, simPieces);
