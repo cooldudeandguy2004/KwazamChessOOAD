@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -59,6 +60,8 @@ public class GamePanel extends JPanel implements Runnable {
     private Command saveGameCommand;
     private Command newGameCommand;
     private Command loadGameCommand;
+
+    private boolean flipBoard = false;
     
 
     // Game panel attributes and methods
@@ -73,7 +76,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Side panel
         sidePanel = new JPanel();
-        sidePanel.setPreferredSize(new Dimension(142, 10));
+        sidePanel.setPreferredSize(new Dimension(142, HEIGHT));
         sidePanel.setBackground(Color.WHITE);
 
         //Initialize commands
@@ -111,7 +114,7 @@ public class GamePanel extends JPanel implements Runnable {
         });
         sidePanel.add(loadGameButton);
 
-        this.setLayout(new BorderLayout());
+    
         this.add(sidePanel, BorderLayout.EAST);
 
     }
@@ -186,15 +189,28 @@ public class GamePanel extends JPanel implements Runnable {
         // Mouse button pressed
         if (mouse.pressed) {
             if (activeP == null) {
-                for (Piece piece : simPieces) {
-                    if (piece.color == currentColor &&
-                            piece.col == mouse.x / Board.SQUARE_SIZE &&
-                            piece.row == mouse.y / Board.SQUARE_SIZE) {
-                        activeP = piece;
-                    }
+
+            // Get raw mouse coordinates
+            int mouseX = mouse.x;
+            int mouseY = mouse.y;
+
+            // Flip coordinates if the board is rotated
+            if (flipBoard) {
+                mouseX = (Board.MAX_COL * Board.SQUARE_SIZE) - mouseX - 1;
+                mouseY = (Board.MAX_ROW * Board.SQUARE_SIZE) - mouseY - 1;
+            }
+
+            int mouseCol = mouseX / Board.SQUARE_SIZE;
+            int mouseRow = mouseY / Board.SQUARE_SIZE; 
+
+            for (Piece piece : simPieces) {
+                if (piece.color == currentColor && piece.col == mouseCol && piece.row == mouseRow) {
+                    activeP = piece;
+                    break;
                 }
-            } else {
-                simulate();
+            }
+        } else {
+            simulate();
             }
         }
 
@@ -223,11 +239,24 @@ public class GamePanel extends JPanel implements Runnable {
 
         copyPieces(pieces, simPieces);
 
-        activeP.x = mouse.x - Board.HALF_SQUARE_SIZE;
-        activeP.y = mouse.y - Board.HALF_SQUARE_SIZE;
+        // Get raw mouse coordinates
+        int mouseX = mouse.x;
+        int mouseY = mouse.y;
+
+        // Flip coordinates if the board is visually rotated
+        if (flipBoard) {
+        mouseX = (Board.MAX_COL * Board.SQUARE_SIZE) - mouseX - 1;
+        mouseY = (Board.MAX_ROW * Board.SQUARE_SIZE) - mouseY - 1;
+        }
+
+        // Update active piece position
+        activeP.x = mouseX - Board.HALF_SQUARE_SIZE;
+        activeP.y = mouseY - Board.HALF_SQUARE_SIZE;
+
+        // Calculate logical column/row
         activeP.col = activeP.getCol(activeP.x);
         activeP.row = activeP.getRow(activeP.y);
-
+    
         if (activeP.canMove(activeP.col, activeP.row)) {
             canMove = true;
             if (activeP.hittingP != null) {
@@ -251,6 +280,7 @@ public class GamePanel extends JPanel implements Runnable {
                 transformPieces();
             }
         }
+        flipBoard = !flipBoard;
         activeP = null;
     }
 
@@ -275,8 +305,15 @@ public class GamePanel extends JPanel implements Runnable {
     // Paints the necessary components onto the frame
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         Graphics2D g2 = (Graphics2D) g;
+
+        AffineTransform originalTransform = g2.getTransform();
+
+        if (flipBoard) {
+            int centerX = (Board.MAX_COL * Board.SQUARE_SIZE) / 2;
+            int centerY = (Board.MAX_ROW * Board.SQUARE_SIZE) / 2;
+            g2.rotate(Math.PI, centerX, centerY);
+        }
         // Board
         board.draw(g2);
         // Pieces
@@ -289,12 +326,14 @@ public class GamePanel extends JPanel implements Runnable {
                 g2.setColor(Color.blue);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7F));
                 g2.fillRect(activeP.col * Board.SQUARE_SIZE, activeP.row * Board.SQUARE_SIZE,
-                        Board.SQUARE_SIZE, Board.SQUARE_SIZE);
+                    Board.SQUARE_SIZE, Board.SQUARE_SIZE);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
             }
 
             activeP.draw(g2);
         }
+
+        g2.setTransform(originalTransform);
 
         // status
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -397,16 +436,18 @@ public class GamePanel extends JPanel implements Runnable {
         int confirmation = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to start a new game? All progress will be lost.", "New Game Confirmation",
                 JOptionPane.YES_NO_OPTION);
-        if (confirmation == JOptionPane.YES_NO_OPTION) {
+        if (confirmation == JOptionPane.YES_OPTION) {
             pieces.clear(); // Clear pieces and reset game state
             simPieces.clear();
             transformedPieces.clear(); // Reset any transformed pieces
             setPieces(); // Reput the pieces
-            currentColor = BLUE; // Reset current player to blue
+            currentColor = BLUE;
+            flipBoard = false; // Reset current player to blue
             activeP = null;
             canMove = false; // Reset movement flag
             validSquare = false;
             turnCounter = 0; // Reset turn couner
+            isGameOver = false;
             copyPieces(pieces, simPieces); // Reinitialize pieces to new game state
             launchGame();
             repaint();
