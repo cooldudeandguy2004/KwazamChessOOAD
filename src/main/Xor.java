@@ -1,7 +1,10 @@
 package main;
 
+//Ammar
+//Xor Pieces class
 public class Xor extends Piece {
 
+    //Ammar
     public Xor(int color, int col, int row) {
         super(color, col, row, "XOR");
 
@@ -12,6 +15,7 @@ public class Xor extends Piece {
         }
     }
 
+    //Faiz
     public boolean canMove(int targetCol, int targetRow) {
 
         if (isWithinBoard(targetCol, targetRow) && isSameSquare(targetCol, targetRow) == false) {

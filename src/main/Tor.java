@@ -1,5 +1,7 @@
 package main;
 
+//Ammar
+//Tor Pieces class
 public class Tor extends Piece {
 
     public Tor(int color, int col, int row) {
@@ -12,6 +14,7 @@ public class Tor extends Piece {
         }
     }
 
+    //Faiz
     @Override
     public boolean canMove(int targetCol, int targetRow) {
         if (isWithinBoard(targetCol, targetRow) && isSameSquare(targetCol, targetRow) == false) {

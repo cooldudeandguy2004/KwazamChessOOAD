@@ -1,7 +1,10 @@
 package main;
 
+//Ammar
+//Ram Pieces class
 public class Ram extends Piece {
 
+    //Ammar
     public Ram(int color, int col, int row) {
         super(color, col, row, "RAM");
 
@@ -13,6 +16,7 @@ public class Ram extends Piece {
     }
 
     // Change direction once piece reach the end
+    //Adlan
     int moveFactor = 1;
 
     private int changeDirection() {

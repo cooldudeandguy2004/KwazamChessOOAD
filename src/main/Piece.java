@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+//Ammar, Faiz
+//Holds the attributes and methods of pieces in this program
 public abstract class Piece {
 
     public Image image;

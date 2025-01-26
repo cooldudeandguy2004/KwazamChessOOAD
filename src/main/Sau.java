@@ -1,5 +1,7 @@
 package main;
 
+//Ammar
+//Sau Pieces class
 public class Sau extends Piece {
 
     public Sau(int color, int col, int row) {
@@ -12,6 +14,7 @@ public class Sau extends Piece {
         }
     }
 
+    //Faiz
     public boolean canMove(int targetCol, int targetRow) {
 
         if (isWithinBoard(targetCol, targetRow)) {

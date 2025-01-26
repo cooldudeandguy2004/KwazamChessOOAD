@@ -3,6 +3,7 @@ package main;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+//Faiz
 public class Mouse extends MouseAdapter {
 
     public int x, y;

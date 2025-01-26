@@ -1,5 +1,7 @@
 package main;
 
+//Ammar
+//Save game command method
 public class SaveGameCommand implements Command {
     private GamePanel gamePanel;
 

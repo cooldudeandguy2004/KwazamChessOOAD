@@ -2,6 +2,8 @@ package main;
 
 import javax.swing.JFrame;
 
+//Ammar
+//Main code to run the whole program
 public class Main {
 
     public static void main(String[] args) {

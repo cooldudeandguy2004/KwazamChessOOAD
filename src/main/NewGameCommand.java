@@ -1,5 +1,7 @@
 package main;
 
+//Ammar
+//New game command method
 public class NewGameCommand implements Command {
     private GamePanel gamePanel;
 

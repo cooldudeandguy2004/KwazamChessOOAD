@@ -25,45 +25,51 @@ import java.awt.AlphaComposite;
 import java.awt.Font;
 import java.awt.RenderingHints;
 
+//Ammar, Faiz, Adlan
+/**
+ * The main game panel handling rendering, game logic, and user interactions.
+ * Manages the chessboard, pieces, turns, and game state (saving/loading).
+ * Implements Runnable for the game loop and uses the Command pattern for UI
+ * actions.
+ */
 public class GamePanel extends JPanel implements Runnable {
 
-    public static final int WIDTH = 600;
-    public static final int HEIGHT = 750;
-    final int FPS = 60;
-    Thread gameThread;
-    Board board = new Board();
-    Mouse mouse = new Mouse();
+    // Constants for panel dimension and FPS
+    public static final int WIDTH = 600; // Width of the game panel
+    public static final int HEIGHT = 750; // Height of the game panel
+    final int FPS = 60; // Frames per second for game loop
+
+    // Core game components
+    Thread gameThread; // Thread for the game loop
+    Board board = new Board(); // Chessboard layout
+    Mouse mouse = new Mouse(); // Mouse input handler
 
     // Pieces
-    public static ArrayList<Piece> pieces = new ArrayList<>();
-    public static ArrayList<Piece> simPieces = new ArrayList<>();
-    ArrayList<Piece> transformedPieces = new ArrayList<>();
-    Piece activeP;
+    public static ArrayList<Piece> pieces = new ArrayList<>(); // Active pieces on the board
+    public static ArrayList<Piece> simPieces = new ArrayList<>();// Simulated pieces for movement preview
+    ArrayList<Piece> transformedPieces = new ArrayList<>(); // Transformed pieces (Tor/Xor swaps)
+    Piece activeP; // Currently selected/dragged piece
 
-    // Color
-    public static final int RED = 1;
-    public static final int BLUE = 0;
-    int currentColor = BLUE;
+    // Game state
+    public static final int RED = 1; // Identifier for red team
+    public static final int BLUE = 0; // Identifier for blue team
+    int currentColor = BLUE; // Current player's turn (BLUE starts)
+    boolean canMove; // Flag for valid movement
+    boolean validSquare; // Flag for valid target square
+    private boolean isGameOver = false; // Game over state
+    private int turnCounter = 0; // Tracks turns for piece transformation
 
-    // Booleans
-    boolean canMove;
-    boolean validSquare;
-
-    // Side panel to put save, load, and new game button
-    private JPanel sidePanel;
-    private JButton saveGameButton;
-    private JButton newGameButton;
-    private JButton loadGameButton;
-
-    // Game over
-    private boolean isGameOver = false;
+    // UI
+    private JPanel sidePanel; // Panel for buttons
+    private JButton saveGameButton; // Save game button
+    private JButton newGameButton; // New game button
+    private JButton loadGameButton; // Load game button
 
     // Command design pattern fields
-    private Command saveGameCommand;
-    private Command newGameCommand;
-    private Command loadGameCommand;
-
-    private boolean flipBoard = false;
+    private Command saveGameCommand; // Command for saving game
+    private Command newGameCommand; // Command for new game
+    private Command loadGameCommand; // Command for loading game
+    private boolean flipBoard = false; // Toggles board rotation for turns
 
     // Game panel attributes and methods
     public GamePanel() {
@@ -119,7 +125,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     }
 
-    // Launch game method
+    // Game loop thread
     public void launchGame() {
         gameThread = new Thread(this);
         gameThread.start();
@@ -266,9 +272,6 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    // Turn counter variable
-    private int turnCounter = 0;
-
     private void changePlayer() {
         if (currentColor == BLUE) {
             currentColor = RED;
@@ -347,26 +350,6 @@ public class GamePanel extends JPanel implements Runnable {
             g2.drawString("Red's turn", 530, 250);
         }
     }
-
-    /*
-     * Helper method to create piece based on type
-     * private Piece createPiece(String pieceType, int color, int col, int row) {
-     * switch (pieceType) {
-     * case "Ram":
-     * return new Ram(color, col, row);
-     * case "Xor":
-     * return new Xor(color, col, row);
-     * case "Biz":
-     * return new Biz(color, col, row);
-     * case "Sau":
-     * return new Sau(color, col, row);
-     * case "Tor":
-     * return new Tor(color, col, row);
-     * default:
-     * return null;
-     * }
-     * }
-     */
 
     private static final Map<String, PieceFactory> pieceFactories = new HashMap<>();
 

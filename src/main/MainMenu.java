@@ -10,6 +10,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 
+//Ammar
+//Launches main menu of the program
 public class MainMenu extends JPanel {
 
     private JFrame window;
