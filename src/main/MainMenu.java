@@ -18,8 +18,7 @@ public class MainMenu extends JPanel {
     //Sets the mainmenu window
     public MainMenu(JFrame window) {
         this.window = window;
-        //setLayout(new GridLayout(3, 1));
-        setLayout(null);
+        setLayout(null);//setLayout(new GridLayout(3, 1));
 
         //Load background image
         try {
@@ -113,6 +112,7 @@ public class MainMenu extends JPanel {
         window.add(gp);
         window.pack();
         window.setSize(GamePanel.WIDTH, GamePanel.HEIGHT);
+        window.setResizable(true);
         window.setLocationRelativeTo(null);
         window.setVisible(true);
 
@@ -130,6 +130,7 @@ public class MainMenu extends JPanel {
             GamePanel gp = new GamePanel();
             window.getContentPane().removeAll();
             window.add(gp);
+            window.setResizable(true);
             window.pack();
             window.setSize(GamePanel.WIDTH, GamePanel.HEIGHT);
             window.setLocationRelativeTo(null);

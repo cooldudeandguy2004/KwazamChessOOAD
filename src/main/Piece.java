@@ -48,7 +48,7 @@ public class Piece {
     public int getCol (int x) {
         return (x + Board.HALF_SQUARE_SIZE)/Board.SQUARE_SIZE;
     }
-    public int getRow (int x) {
+    public int getRow (int y) {
         return (y + Board.HALF_SQUARE_SIZE)/Board.SQUARE_SIZE;
     }
     public int getIndex() {

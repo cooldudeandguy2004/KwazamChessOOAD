@@ -13,10 +13,11 @@ public class Main {
         //Create main menu
         MainMenu menu = new MainMenu(window);
         window.add(menu);
-
         window.setSize(800,600);
+        window.setResizable(true);
         window.setLocationRelativeTo(null);
         window.setVisible(true);
+        
     }
 
 }
