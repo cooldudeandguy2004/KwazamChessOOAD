@@ -1,6 +1,6 @@
 package main;
 
-public class NewGameCommand implements Command{
+public class NewGameCommand implements Command {
     private GamePanel gamePanel;
 
     public NewGameCommand(GamePanel gamePanel) {

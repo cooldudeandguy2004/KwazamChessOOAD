@@ -1,6 +1,6 @@
 package main;
 
-public class SaveGameCommand implements Command{
+public class SaveGameCommand implements Command {
     private GamePanel gamePanel;
 
     public SaveGameCommand(GamePanel gamePanel) {

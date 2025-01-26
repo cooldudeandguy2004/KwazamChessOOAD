@@ -15,6 +15,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -56,13 +58,12 @@ public class GamePanel extends JPanel implements Runnable {
     // Game over
     private boolean isGameOver = false;
 
-    //Command design pattern fields
+    // Command design pattern fields
     private Command saveGameCommand;
     private Command newGameCommand;
     private Command loadGameCommand;
 
     private boolean flipBoard = false;
-    
 
     // Game panel attributes and methods
     public GamePanel() {
@@ -79,7 +80,7 @@ public class GamePanel extends JPanel implements Runnable {
         sidePanel.setPreferredSize(new Dimension(142, HEIGHT));
         sidePanel.setBackground(Color.WHITE);
 
-        //Initialize commands
+        // Initialize commands
         saveGameCommand = new SaveGameCommand(this);
         loadGameCommand = new LoadGameCommand(this);
         newGameCommand = new NewGameCommand(this);
@@ -114,7 +115,6 @@ public class GamePanel extends JPanel implements Runnable {
         });
         sidePanel.add(loadGameButton);
 
-    
         this.add(sidePanel, BorderLayout.EAST);
 
     }
@@ -190,27 +190,27 @@ public class GamePanel extends JPanel implements Runnable {
         if (mouse.pressed) {
             if (activeP == null) {
 
-            // Get raw mouse coordinates
-            int mouseX = mouse.x;
-            int mouseY = mouse.y;
+                // Get raw mouse coordinates
+                int mouseX = mouse.x;
+                int mouseY = mouse.y;
 
-            // Flip coordinates if the board is rotated
-            if (flipBoard) {
-                mouseX = (Board.MAX_COL * Board.SQUARE_SIZE) - mouseX - 1;
-                mouseY = (Board.MAX_ROW * Board.SQUARE_SIZE) - mouseY - 1;
-            }
-
-            int mouseCol = mouseX / Board.SQUARE_SIZE;
-            int mouseRow = mouseY / Board.SQUARE_SIZE; 
-
-            for (Piece piece : simPieces) {
-                if (piece.color == currentColor && piece.col == mouseCol && piece.row == mouseRow) {
-                    activeP = piece;
-                    break;
+                // Flip coordinates if the board is rotated
+                if (flipBoard) {
+                    mouseX = (Board.MAX_COL * Board.SQUARE_SIZE) - mouseX - 1;
+                    mouseY = (Board.MAX_ROW * Board.SQUARE_SIZE) - mouseY - 1;
                 }
-            }
-        } else {
-            simulate();
+
+                int mouseCol = mouseX / Board.SQUARE_SIZE;
+                int mouseRow = mouseY / Board.SQUARE_SIZE;
+
+                for (Piece piece : simPieces) {
+                    if (piece.color == currentColor && piece.col == mouseCol && piece.row == mouseRow) {
+                        activeP = piece;
+                        break;
+                    }
+                }
+            } else {
+                simulate();
             }
         }
 
@@ -245,8 +245,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Flip coordinates if the board is visually rotated
         if (flipBoard) {
-        mouseX = (Board.MAX_COL * Board.SQUARE_SIZE) - mouseX - 1;
-        mouseY = (Board.MAX_ROW * Board.SQUARE_SIZE) - mouseY - 1;
+            mouseX = (Board.MAX_COL * Board.SQUARE_SIZE) - mouseX - 1;
+            mouseY = (Board.MAX_ROW * Board.SQUARE_SIZE) - mouseY - 1;
         }
 
         // Update active piece position
@@ -256,7 +256,7 @@ public class GamePanel extends JPanel implements Runnable {
         // Calculate logical column/row
         activeP.col = activeP.getCol(activeP.x);
         activeP.row = activeP.getRow(activeP.y);
-    
+
         if (activeP.canMove(activeP.col, activeP.row)) {
             canMove = true;
             if (activeP.hittingP != null) {
@@ -326,7 +326,7 @@ public class GamePanel extends JPanel implements Runnable {
                 g2.setColor(Color.blue);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7F));
                 g2.fillRect(activeP.col * Board.SQUARE_SIZE, activeP.row * Board.SQUARE_SIZE,
-                    Board.SQUARE_SIZE, Board.SQUARE_SIZE);
+                        Board.SQUARE_SIZE, Board.SQUARE_SIZE);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
             }
 
@@ -348,22 +348,39 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    // Helper method to create piece based on type
+    /*
+     * Helper method to create piece based on type
+     * private Piece createPiece(String pieceType, int color, int col, int row) {
+     * switch (pieceType) {
+     * case "Ram":
+     * return new Ram(color, col, row);
+     * case "Xor":
+     * return new Xor(color, col, row);
+     * case "Biz":
+     * return new Biz(color, col, row);
+     * case "Sau":
+     * return new Sau(color, col, row);
+     * case "Tor":
+     * return new Tor(color, col, row);
+     * default:
+     * return null;
+     * }
+     * }
+     */
+
+    private static final Map<String, PieceFactory> pieceFactories = new HashMap<>();
+
+    static {
+        pieceFactories.put("Ram", Ram::new);
+        pieceFactories.put("Xor", Xor::new);
+        pieceFactories.put("Biz", Biz::new);
+        pieceFactories.put("Sau", Sau::new);
+        pieceFactories.put("Tor", Tor::new);
+    }
+
     private Piece createPiece(String pieceType, int color, int col, int row) {
-        switch (pieceType) {
-            case "Ram":
-                return new Ram(color, col, row);
-            case "Xor":
-                return new Xor(color, col, row);
-            case "Biz":
-                return new Biz(color, col, row);
-            case "Sau":
-                return new Sau(color, col, row);
-            case "Tor":
-                return new Tor(color, col, row);
-            default:
-                return null;
-        }
+        PieceFactory factory = pieceFactories.get(pieceType);
+        return (factory != null) ? factory.create(color, col, row) : null;
     }
 
     // Save game method
